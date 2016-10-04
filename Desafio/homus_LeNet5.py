@@ -13,7 +13,7 @@ import glob
 
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Convolution2D, AveragePooling2D
+from keras.layers import Convolution2D, MaxPooling2D
 from keras.utils import np_utils
 from keras.optimizers import SGD, adam, adadelta
 from keras.models import model_from_json 
@@ -26,10 +26,10 @@ nb_epoch = 50
 
 # HOMUS contains images of 40 x 40 pixels
 # input image dimensions for train 
-img_rows, img_cols = 8, 8
+img_rows, img_cols = 10, 10 #It was 8 8
 
 # number of convolutional filters to use
-nb_filters1 = 6
+nb_filters1 = 6 
 nb_filters2 = 16
 nb_filters3 = 120
 
@@ -44,7 +44,7 @@ nb_pool = 2
 #
 # Load data from data/HOMUS/train_0, data/HOMUS/train_1,...,data/HOMUS_31 folders from HOMUS images
 #
-def load_data():
+def load_data(train_epoch):
 	image_list = []
 	class_list = []
 	for current_class_number in range(0,nb_classes):	# Number of class
@@ -64,23 +64,31 @@ def load_data():
 	np.random.shuffle(combined)
 	X[:], Y[:] = zip(*combined)
 
-	n_partition = int(n*0.9)	# Train 90% and Test 10%
+	n_partition = int(n*0.1)	# Train 90% and Test 10%
+	start = train_epoch*n_partition
+	end = start + n_partition
 
-	X_train = X[:n_partition]
-	Y_train = Y[:n_partition]
+	print("Start:", start)
+	print("End:", end)
+	#TODO change this to return 9 arrays
+	X_train = X[0:start] + X[end+1:] #0:start + end:end_list
+	Y_train = []
+	#Y_train = Y[0:(start-1)] + X[(end+1):]
 	
-	X_test  = X[n_partition:]
-	Y_test  = Y[n_partition:]
+	X_test  = X[start+1:end]
+	Y_test  = Y[start+1:end]
 	
 	return X_train, Y_train, X_test, Y_test
 	
 # the data split between train and test sets
+'''
 X_train, Y_train, X_test, Y_test = load_data()
 
 print(X_train.shape[0], 'train samples')
 print(X_test.shape[0], 'test samples')
 print(img_rows,'x', img_cols, 'image size')
 print(nb_epoch,'epochs')
+'''
 
 #
 # Neural Network Structure
@@ -89,11 +97,11 @@ print(nb_epoch,'epochs')
 model = Sequential()
 
 model.add(Convolution2D(nb_filters1, nb_conv1, nb_conv1, border_mode='same', input_shape = (1, img_rows, img_cols)))
-model.add(AveragePooling2D(pool_size=(nb_pool, nb_pool)))
+model.add(MaxPooling2D(pool_size=(nb_pool, nb_pool)))
 model.add(Activation("sigmoid"))
 
 model.add(Convolution2D(nb_filters2, nb_conv2, nb_conv2, border_mode='same'))
-model.add(AveragePooling2D(pool_size=(nb_pool, nb_pool)))
+model.add(MaxPooling2D(pool_size=(nb_pool, nb_pool)))
 model.add(Activation("sigmoid"))
 model.add(Dropout(0.5))
 
@@ -110,9 +118,29 @@ model.compile(loss='categorical_crossentropy',
               optimizer=op,
               metrics=['accuracy'])
 
+for i in range(10):
+	#loading different sets
+	X_train, Y_train, X_test, Y_test = load_data(i)
+
+	print(X_train.shape[0], 'train samples')
+	print(X_test.shape[0], 'test samples')
+	print(img_rows,'x', img_cols, 'image size')
+	print(nb_epoch,'epochs')
+
+	model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch,
+          verbose=1, validation_split=0.2)
+	score = model.evaluate(X_test, Y_test, verbose=0)
+
+	print('Test score:', score[0])
+	print('Test accuracy:', score[1])
+
+
+
+'''
 model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch,
           verbose=1, validation_split=0.2)
 score = model.evaluate(X_test, Y_test, verbose=0)
+'''
 
 #
 # Results

@@ -2,6 +2,8 @@
 Trains a simple LeNet-5 (http://yann.lecun.com/exdb/lenet/) adapted to the HOMUS dataset using Keras Software (http://keras.io/)
 
 LeNet-5 demo example http://eblearn.sourceforge.net/beginner_tutorial2_train.html
+
+This example executed with 8x8 reescaled images and 50 epochs obtains an accuracy close to 36%.
 '''
 
 from __future__ import print_function
@@ -11,11 +13,10 @@ import glob
 
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Convolution2D, MaxPooling2D
+from keras.layers import Convolution2D, AveragePooling2D
 from keras.utils import np_utils
 from keras.optimizers import SGD, adam, adadelta
-from keras.models import model_from_json
-from keras import backend as K
+from keras.models import load_model
 
 np.random.seed(1337)  # for reproducibility
 
@@ -25,35 +26,20 @@ nb_epoch = 50
 
 # HOMUS contains images of 40 x 40 pixels
 # input image dimensions for train 
-img_rows, img_cols = 10, 10 #It was 8 8
+img_rows, img_cols = 8, 8
 
 # number of convolutional filters to use
-nb_filters1 = 6  #6
-nb_filters2 = 16  #16
-nb_filters3 = 120 #120
+nb_filters1 = 6
+nb_filters2 = 16
+nb_filters3 = 120
 
 # convolution kernel size
-nb_conv1 = 5 #5
-nb_conv2 = 6 #6
-nb_conv3 = 2 #1
+nb_conv1 = 5
+nb_conv2 = 6
+nb_conv3 = 1
 
 # size of pooling area for max pooling
 nb_pool = 2
-
-#Activation function
-activFunction = "sigmoid" #it was "sigmoid"
-
-
-'''
-if K.image_dim_ordering() == 'th':
-    X_train = X_train.reshape(X_train.shape[0], 1, img_rows, img_cols)
-    X_test = X_test.reshape(X_test.shape[0], 1, img_rows, img_cols)
-    input_shape = (1, img_rows, img_cols)
-else:
-    X_train = X_train.reshape(X_train.shape[0], img_rows, img_cols, 1)
-    X_test = X_test.reshape(X_test.shape[0], img_rows, img_cols, 1)
-input_shape = (img_rows, img_cols, 1)
-'''
 	
 #
 # Load data from data/HOMUS/train_0, data/HOMUS/train_1,...,data/HOMUS_31 folders from HOMUS images
@@ -103,20 +89,19 @@ print(nb_epoch,'epochs')
 model = Sequential()
 
 model.add(Convolution2D(nb_filters1, nb_conv1, nb_conv1, border_mode='same', input_shape = (1, img_rows, img_cols)))
-model.add(MaxPooling2D(pool_size=(nb_pool, nb_pool)))
-model.add(Activation(activFunction))
-model.add(Dropout(0.25))
+model.add(AveragePooling2D(pool_size=(nb_pool, nb_pool)))
+model.add(Activation("sigmoid"))
 
 model.add(Convolution2D(nb_filters2, nb_conv2, nb_conv2, border_mode='same'))
-model.add(MaxPooling2D(pool_size=(nb_pool, nb_pool)))
-model.add(Activation(activFunction))
-model.add(Dropout(0.25))
+model.add(AveragePooling2D(pool_size=(nb_pool, nb_pool)))
+model.add(Activation("sigmoid"))
+model.add(Dropout(0.5))
 
 model.add(Convolution2D(nb_filters3, nb_conv3, nb_conv3, border_mode='same'))
 
 model.add(Flatten())
 model.add(Dense(128))
-model.add(Activation(activFunction))
+model.add(Activation("sigmoid"))
 model.add(Dense(nb_classes))
 model.add(Activation('softmax'))
 
@@ -137,16 +122,12 @@ print('Test score:', score[0])
 print('Test accuracy:', score[1])
 
 
-'''
 # file name to save model
 filename='homus_cnn.h5'
-
 
 # save network model
 model.save(filename)
 
 # load neetwork model
 #model = load_model(filename)
-'''
-
 

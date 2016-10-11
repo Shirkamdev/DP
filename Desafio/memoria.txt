@@ -1,1 +1,14 @@
--augmented image size to 10x10
+#to install sklearn --> to do 10-cv --> Kfold
+
+-initial changes; using maxPooling 	--> Test score: 1.53984852841 	Test accuracy: 0.488304093916
+-augmented image size to 10x10 		--> Test score: 1.18918483996 	Test accuracy: 0.583333332985
+	#Using 10x10
+	-using relu activation function		--> Test score: 2.2997965004 	Test accuracy: 0.287280701667
+	-reduced dropout to 0.25 			--> Test score: 0.895493638794 	Test accuracy: 0.663011695906
+	-adding droput at first layer		--> Test score: 0.996001893665	Test accuracy: 0.644005847605
+		-changed nb_filters1 to 12			--> Test score: 1.04295542331 	Test accuracy: 0.639619883041
+		-changed nb_conv1 to 4				--> Test score: 1.48940669793	Test accuracy: 0.506578947543
+		-changed nb_conv3 to 2				--> Test score: 1.09085749952	Test accuracy: 0.623538011696z
+
+-augmented image size to 20x20		--> Test score: 2.91961194897 Test accuracy: 0.128654970782
+

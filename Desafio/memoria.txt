@@ -1,14 +1,35 @@
 #to install sklearn --> to do 10-cv --> Kfold
 
 -initial changes; using maxPooling 	--> Test score: 1.53984852841 	Test accuracy: 0.488304093916
--augmented image size to 10x10 		--> Test score: 1.18918483996 	Test accuracy: 0.583333332985
-	#Using 10x10
-	-using relu activation function		--> Test score: 2.2997965004 	Test accuracy: 0.287280701667
-	-reduced dropout to 0.25 			--> Test score: 0.895493638794 	Test accuracy: 0.663011695906
-	-adding droput at first layer		--> Test score: 0.996001893665	Test accuracy: 0.644005847605
-		-changed nb_filters1 to 12			--> Test score: 1.04295542331 	Test accuracy: 0.639619883041
-		-changed nb_conv1 to 4				--> Test score: 1.48940669793	Test accuracy: 0.506578947543
-		-changed nb_conv3 to 2				--> Test score: 1.09085749952	Test accuracy: 0.623538011696z
+	-augmented image size to 10x10 		--> Test score: 1.18918483996 	Test accuracy: 0.583333332985
+		#Using 10x10
+		-using relu activation function		--> Test score: 2.2997965004 	Test accuracy: 0.287280701667
+		-reduced dropout to 0.25 			--> Test score: 0.895493638794 	Test accuracy: 0.663011695906
+		-adding droput at first layer		--> Test score: 0.996001893665	Test accuracy: 0.644005847605
+			-changed nb_filters1 to 12			--> Test score: 1.04295542331 	Test accuracy: 0.639619883041
+			-changed nb_conv1 to 4				--> Test score: 1.48940669793	Test accuracy: 0.506578947543
+			-changed nb_conv3 to 2				--> Test score: 1.09085749952	Test accuracy: 0.623538011696z
+		
+	-augmented image size to 20x20		--> Test score: 1.88992500096 Test accuracy: 0.426169590643
+		#Using 20x20
+		-using relu activation function		-->	Test score: nan				Test accuracy: 0.0211988304311
+		-reduced dropout to 0.25			-->	Test score: 1.49828687676	Test accuracy: 0.525584795147
+			-added dropout to first layer	-->	Test score: 1.46546595626	Test accuracy: 0.5540935676
+				(0.25)
+					-changed last activation function	--> 
+						to softmax 
+			-added dropout to first layer	-->	Test score: 1.46016711519	Test accuracy: 0.544590643623
+				(0.1)
+	-augmented image size to 30x30
+		#30x30 -- 15 epochs
+		-using nadam optimizer			--> 	(70%)
+			-Changed nb_conv1 to 4			-->	Test score: 0.529501961686	Test accuracy: 0.817251461988
+				-Changed nb_filters1 to 8		--> Test score: 0.531969256917	Test accuracy: 0.820175438945
+					-nb_filters3 = 144				-->	Test score: 0.580722601616	Test accuracy: 0.800438596143
+				-changed learning rate 			-->	Test score: 0.791129665417	Test accuracy: 0.733918128306
+					to 0.005
+				-changed nb_conv2 to 3			--> fail
+				-changed nb_conv2 to 8			--> Test score: 0.570342568626	Test accuracy: 0.816520468185
+				-dropout 0.25 nb_conv2=6		--> Test score: 0.528713365047	Test accuracy: 0.808479532164
 
--augmented image size to 20x20		--> Test score: 2.91961194897 Test accuracy: 0.128654970782
 

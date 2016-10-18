@@ -13,28 +13,28 @@ import glob
 
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Convolution2D, MaxPooling2D
+from keras.layers import Convolution2D, AveragePooling2D
 from keras.utils import np_utils
-from keras.optimizers import SGD, adam, adadelta, nadam
+from keras.optimizers import SGD, adam, adadelta
 from keras.models import load_model
 from keras import backend as K
 
 batch_size = 16
 nb_classes = 32
-nb_epoch = 15
+nb_epoch = 50
 
 # HOMUS contains images of 40 x 40 pixels
 # input image dimensions for train 
-img_rows, img_cols = 30, 30
+img_rows, img_cols = 20, 20
 
 # number of convolutional filters to use
-nb_filters1 = 8 #8
+nb_filters1 = 6
 nb_filters2 = 16
-nb_filters3 = 120 #120
+nb_filters3 = 120
 
 # convolution kernel size
-nb_conv1 = 4 #5
-nb_conv2 = 6 #6
+nb_conv1 = 5
+nb_conv2 = 6
 nb_conv3 = 1
 
 # size of pooling area for max pooling
@@ -95,26 +95,23 @@ print(nb_epoch,'epochs')
 model = Sequential()
 
 model.add(Convolution2D(nb_filters1, nb_conv1, nb_conv1, border_mode='valid', input_shape = input_shape))
-model.add(MaxPooling2D(pool_size=(nb_pool, nb_pool)))
+model.add(AveragePooling2D(pool_size=(nb_pool, nb_pool)))
 model.add(Activation("sigmoid"))
-model.add(Dropout(0.1))
 
 model.add(Convolution2D(nb_filters2, nb_conv2, nb_conv2, border_mode='valid'))
-model.add(MaxPooling2D(pool_size=(nb_pool, nb_pool)))
+model.add(AveragePooling2D(pool_size=(nb_pool, nb_pool)))
 model.add(Activation("sigmoid"))
-model.add(Dropout(0.25))
+model.add(Dropout(0.5))
 
 model.add(Convolution2D(nb_filters3, nb_conv3, nb_conv3, border_mode='valid'))
 
 model.add(Flatten())
-model.add(Dense(256)) #256
+model.add(Dense(256))
 model.add(Activation("sigmoid"))
 model.add(Dense(nb_classes))
 model.add(Activation('softmax'))
 
-#optimizer=adadelta()
-#optimizer=nadam(lr=0.005, beta_1=0.9, beta_2=0.999, epsilon=1e-08, schedule_decay=0.004)
-optimizer=nadam()
+optimizer=adadelta()
 model.compile(loss='categorical_crossentropy',optimizer=optimizer, metrics=['accuracy'])
 
 model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch,

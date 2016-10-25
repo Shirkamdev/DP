@@ -31,5 +31,28 @@
 				-changed nb_conv2 to 3			--> fail
 				-changed nb_conv2 to 8			--> Test score: 0.570342568626	Test accuracy: 0.816520468185
 				-dropout 0.25 nb_conv2=6		--> Test score: 0.528713365047	Test accuracy: 0.808479532164
+					-nb_filters2 20				--> Test score: 0.512265850577	Test accuracy: 0.826754385616
 
 
+-----------------------------
+
+FROM ORIGINAL FILE
+
+-Using maxPooling				-->	Test score: 2.3086544575	Test accuracy: 0.294590643449
+	#20x20
+	--Using relu activation function	--> Test score: 1.45196606611	Test accuracy: 0.524122806843
+		--Using nadam optimizer				-->	Test score: 2.15449256019	Test accuracy: 0.322368421053
+	--Using nadam optimizer				--> Test score: 1.66434893204	Test accuracy: 0.47149122807
+
+	#30x30
+	-Changed 30x30 img size				-->	Test score: 1.09095461327	Test accuracy: 0.662280702103
+		--Using relu activation function	-->	Test score: 0.499570751748	Test accuracy: 0.833333333682
+			--Using nadam optimizer				--> Test score: 0.430572717859	Test accuracy: 0.858918129004 
+				--Reduced dropout to 0.25			-->	Test score: 0.579168779547	Test accuracy: 0.833333333682
+				--Added dropout to first layer		-->	Test score: 0.559702557953	Test accuracy: 0.818713450641
+					--Reduced dropout to 0.25			-->	Test score: 0.438946202223	Test accuracy: 0.852339181635
+						--nb_filters1 to 8						--> Test score: 0.435846546589	Test accuracy: 0.85672514585
+							-nb_filters2 to 20					-->	Test score: 0.446132603793	Test accuracy: 0.843567251113
+							-nb_filters2 to 13					-->	Test score: 0.373165540354	Test accuracy: 0.866228070175
+								-nb_filters3 to 135					-->	Test score: 0.471690807426	Test accuracy: 0.83260233953
+						--nb_conv1 to 4						-->	Test score: 0.439963326642	Test accuracy: 0.852339181287

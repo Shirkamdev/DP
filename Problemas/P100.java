@@ -4,12 +4,14 @@ public class P100 {
 	private int N; //n maximo de dias de permiso
 	private int L; //Separacion minima de los dias
 	private ArrayList<Integer> preferenciaDias;
+	Integer[][] almacen;
 
 	private ArrayList<Integer> solucion;
 
 	public P100() {
 		preferenciaDias = new ArrayList<Integer>();
 		solucion = new ArrayList<Integer>();
+		almacen = new int[preferenciaDias.size()][N];
 	}
 
 	private void init(String v) {
@@ -26,88 +28,112 @@ public class P100 {
 		}
 
 		printVarValues();
+		System.out.println();
 	}
 
 	public ArrayList<Integer> bestSolution(String s) {
 		init(s);
-		solucion = recursiveSolution(N, -1);
+		solucion = recursiveSolution(preferenciaDias.size()-1, N);
 
 		return solucion;
 	}
 
-	private ArrayList<Integer> recursiveSolution(int n, int last) {
-		if(n == 1) { //caso base
-			ArrayList<Integer> aux = new ArrayList<>();
-			aux.add(maxOfList(last));
-
-			//////
-			System.out.println("\tWith last="+last+" the best choice is "+aux.get(0)+" ValueOf: "+solutionListValue(aux));
-			/////
-
-			return aux;
+	private ArrayList<Integer> recursiveSolution(int m, int n) {
+		if(m < 1 || n == 0) {
+			return new ArrayList<Integer>();
 		}
 		else {
-			//TODO make this recursion great again XD
+			ArrayList<Integer> sol1, sol2;
+			sol1 = recursiveSolution(m-L, n-1);
+			sol1.add(m+1); //To start in 1
+			sol2 = recursiveSolution(m-1, n);
+			if(getSolutionValue(sol1) > getSolutionValue(sol2)) {
+				//We choose the day
+				return sol1;
+			}
+			else {
+				return sol2;
+			}
 		}
 	}
 
-	private void printVarValues() {
-		System.out.println("N: "+N);
-		System.out.println("L: "+L);
-
-		for(int i=0; i<preferenciaDias.size(); i++) {
-			System.out.print(preferenciaDias.get(i));
-			if(i != preferenciaDias.size()-1) {
-				System.out.print(", ");
+	
+	/*private ArrayList<Integer> recursiveSolutionWithStorage(int m, int n) {
+		if(almacen[m][n] != null) {
+			return getStorageValue(m, n);
+		}
+		else {
+			if(m < 1 || n == 0) { //TODO finish this
+				almacen[m][n] = 0;
+				return 0;
 			}
 			else {
-				System.out.println();
+				int sol1 = almacen[m-L][n]+preferenciaDias.get(m);
+
 			}
 		}
+	}*/
 
-		for(int i=0; i<solucion.size(); i++) {
-			System.out.print(solucion.get(i));
-			if(i != solucion.size()-1) {
-				System.out.print(", ");
-			}
-			else {
-				System.out.println();
-			}
-		}
-
-	}
-
-	private int maxOfList(int last) {
-		int max = 0;
+	private ArrayList<Integer> iterativeSolution(int m , int n) {
 		for(int i=0; i<preferenciaDias.size(); ++i) {
-			if(Math.abs(last - i) >= L //If the distance between days is equal or greater than L
-				&& preferenciaDias.get(i) > preferenciaDias.get(max)) {
-				max = i;
+			for(int j=0; j<N; ++j) {
+				
 			}
 		}
-
-		return max+1;
 	}
 
-	private int solutionListValue(ArrayList<Integer> sol) {
+	private int getStorageValue(int m, int n) {
 		int suma = 0;
-		for(int i=0; i<sol.size(); ++i) {
-			suma= preferenciaDias.get(sol.get(i)-1);
+		while(true) {
+			if(n == 0 || m == 0) break;
+			if(almacen[m][n] == 0) break;
+			suma += preferenciaDias.get(almacen[m][n]-1);
+			m = almacen[m][n];
+			n--;
 		}
 
 		return suma;
 	}
 
-	private boolean isNotIntheList(ArrayList<Integer> list, int n) {
-		boolean found = false;
-
-		for(int i=0; i<list.size() && !found; ++i) {
-			if(list.get(i) == n) {
-				found = true;
-			}
+	private int getSolutionValue(ArrayList<Integer> l) {
+		int suma=0;
+		for(int i=0; i<l.size();i++) {
+			suma += preferenciaDias.get(l.get(i)-1);
 		}
 
-		return !found;
+		return suma;
+	}
+
+
+	private void printVarValues() {
+		System.out.println("N: "+N);
+		System.out.println("L: "+L);
+
+		System.out.print("preferenciaDias: ");
+		for(int i=0; i<preferenciaDias.size(); i++) {
+			System.out.print(preferenciaDias.get(i));
+			if(i != preferenciaDias.size()-1) {
+				System.out.print(", ");
+			}
+		}
+		System.out.println();
+
+		System.out.print("solucion: ");
+		for(int i=0; i<solucion.size(); i++) {
+			System.out.print(solucion.get(i));
+			if(i != solucion.size()-1) {
+				System.out.print(", ");
+			}
+		}
+		System.out.println();
+
+	}
+
+	private void printList(ArrayList<Integer> l) {
+		for(int i=0; i<l.size(); ++i) {
+			System.out.print(l.get(i)+" ");
+		}
+		System.out.println();
 	}
 
 

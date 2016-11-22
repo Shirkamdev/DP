@@ -29,13 +29,15 @@ img_rows, img_cols = 30, 30
 
 # number of convolutional filters to use
 nb_filters1 = 8 #6
-nb_filters2 = 13 #16
-nb_filters3 = 135 #120
+nb_filters2 = 20 #16
+nb_filters3 = 120
+
 
 # convolution kernel size
-nb_conv1 = 5
+nb_conv1 = 5 #5
 nb_conv2 = 6
 nb_conv3 = 1
+
 
 # size of pooling area for max pooling
 nb_pool = 2
@@ -96,13 +98,14 @@ model = Sequential()
 
 model.add(Convolution2D(nb_filters1, nb_conv1, nb_conv1, border_mode='valid', input_shape = input_shape))
 model.add(MaxPooling2D(pool_size=(nb_pool, nb_pool)))
-model.add(Activation("relu")) #sigmoid
+model.add(Activation("relu"))
 model.add(Dropout(0.25))
+
 
 model.add(Convolution2D(nb_filters2, nb_conv2, nb_conv2, border_mode='valid'))
 model.add(MaxPooling2D(pool_size=(nb_pool, nb_pool)))
 model.add(Activation("relu"))
-model.add(Dropout(0.25))
+model.add(Dropout(0.5))
 
 model.add(Convolution2D(nb_filters3, nb_conv3, nb_conv3, border_mode='valid'))
 
@@ -112,7 +115,7 @@ model.add(Activation("relu"))
 model.add(Dense(nb_classes))
 model.add(Activation('softmax'))
 
-optimizer=nadam() #adadelta
+optimizer=adam()
 model.compile(loss='categorical_crossentropy',optimizer=optimizer, metrics=['accuracy'])
 
 model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch,

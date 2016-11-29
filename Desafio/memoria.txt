@@ -60,4 +60,8 @@ FROM ORIGINAL FILE
 							nb_filters4=30
 							nb_conv4=4
 			--Using adam optimizer			--> Test score: 0.402528349942	Test accuracy: 0.877192982108
+				--Reduced dropout to 0.25			-->	
 				
+
+--------------------------------
+ Done cross-validation

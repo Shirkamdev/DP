@@ -17,7 +17,10 @@ from keras.layers import Convolution2D, MaxPooling2D
 from keras.utils import np_utils
 from keras.optimizers import SGD, adam, adadelta, nadam
 from keras.models import load_model
+from sklearn.cross_validation import StratifiedKFold
 from keras import backend as K
+
+do_cv = False;
 
 batch_size = 16
 nb_classes = 32
@@ -41,7 +44,11 @@ nb_conv3 = 1
 
 # size of pooling area for max pooling
 nb_pool = 2
+
+accuracy_sum = 0
 	
+
+
 #
 # Load data from data/HOMUS/train_0, data/HOMUS/train_1,...,data/HOMUS_31 folders from HOMUS images
 #
@@ -65,70 +72,87 @@ def load_data():
 		X = np.asarray(image_list).reshape(n,img_rows,img_cols,1)
 		input_shape = (img_rows, img_cols, 1)
 
-	Y = np_utils.to_categorical(np.asarray(class_list), nb_classes)
-	
+	Y = np.asarray(class_list)
+
+	return X, Y, input_shape, n
+
+def train_and_evaluate(model, data_train, labels_train, data_test, labels_test):
+	model.fit(data_train, labels_train, batch_size=batch_size, nb_epoch=nb_epoch,
+          verbose=1, validation_data=(data_test, labels_test))
+	score = model.evaluate(data_test, labels_test, verbose=0)
+	#
+	# Results
+	#
+	print('Test score:', score[0])
+	print('Test accuracy:', score[1])
+	accuracy_sum += score[1]
+
+#
+# Neural Network Structure definition
+#
+def create_model(input_shape):
+	model = Sequential()
+
+	model.add(Convolution2D(nb_filters1, nb_conv1, nb_conv1, border_mode='valid', input_shape = input_shape))
+	model.add(MaxPooling2D(pool_size=(nb_pool, nb_pool)))
+	model.add(Activation("relu"))
+
+
+	model.add(Convolution2D(nb_filters2, nb_conv2, nb_conv2, border_mode='valid'))
+	model.add(MaxPooling2D(pool_size=(nb_pool, nb_pool)))
+	model.add(Activation("relu"))
+	model.add(Dropout(0.25))
+
+	model.add(Convolution2D(nb_filters3, nb_conv3, nb_conv3, border_mode='valid'))
+
+	model.add(Flatten())
+	model.add(Dense(256))
+	model.add(Activation("relu"))
+	model.add(Dense(nb_classes))
+	model.add(Activation('softmax'))
+
+	optimizer=adam()
+	model.compile(loss='categorical_crossentropy',optimizer=optimizer, metrics=['accuracy'])
+
+	return model
+
+
+
+X, Y, input_shape, n = load_data()
+
+if do_cv:
+	n_folds = 10
+	skf = StratifiedKFold(Y, n_folds=n_folds, shuffle=False)
+	Y = np_utils.to_categorical(Y, nb_classes)
+	for i, (train, test) in enumerate(skf):
+		print("Running Fold", i+1, "/", n_folds)
+		model = None # Clearing the NN.
+		model = create_model(input_shape)
+		train_and_evaluate(model, X[train], Y[train], X[test], Y[test])
+
+	print("AVG Test Accuracy: ", accuracy_sum/10.0)
+
+else:
+	Y = np_utils.to_categorical(Y, nb_classes)
 	# Shuffle (X,Y)
 	randomize = np.arange(len(Y))
 	np.random.shuffle(randomize)
 	X, Y = X[randomize], Y[randomize]
-
 	n_partition = int(n*0.9)	# Train 90% and Test 10%
-
 	X_train = X[:n_partition]
 	Y_train = Y[:n_partition]
-	
+
 	X_test  = X[n_partition:]
 	Y_test  = Y[n_partition:]
+
+	print(X_train.shape, 'train samples')
+	print(X_test.shape, 'test samples')
+	print(input_shape,'input_shape')
+	print(nb_epoch,'epochs')
 	
-	return X_train, Y_train, X_test, Y_test, input_shape
-	
-# the data split between train and test sets
-X_train, Y_train, X_test, Y_test, input_shape = load_data()
-
-print(X_train.shape, 'train samples')
-print(X_test.shape, 'test samples')
-print(input_shape,'input_shape')
-print(nb_epoch,'epochs')
-
-#
-# Neural Network Structure
-#
-
-model = Sequential()
-
-model.add(Convolution2D(nb_filters1, nb_conv1, nb_conv1, border_mode='valid', input_shape = input_shape))
-model.add(MaxPooling2D(pool_size=(nb_pool, nb_pool)))
-model.add(Activation("relu"))
-model.add(Dropout(0.25))
-
-
-model.add(Convolution2D(nb_filters2, nb_conv2, nb_conv2, border_mode='valid'))
-model.add(MaxPooling2D(pool_size=(nb_pool, nb_pool)))
-model.add(Activation("relu"))
-model.add(Dropout(0.5))
-
-model.add(Convolution2D(nb_filters3, nb_conv3, nb_conv3, border_mode='valid'))
-
-model.add(Flatten())
-model.add(Dense(256))
-model.add(Activation("relu"))
-model.add(Dense(nb_classes))
-model.add(Activation('softmax'))
-
-optimizer=adam()
-model.compile(loss='categorical_crossentropy',optimizer=optimizer, metrics=['accuracy'])
-
-model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch,
-          verbose=1, validation_data=(X_test, Y_test))
-score = model.evaluate(X_test, Y_test, verbose=0)
-
-#
-# Results
-#
-
-print('Test score:', score[0])
-print('Test accuracy:', score[1])
-
+	# the data split between train and test sets
+	model = create_model(input_shape)
+	train_and_evaluate(model, X_train, Y_train, X_test, Y_test)
 
 # file name to save model
 filename='homus_cnn.h5'

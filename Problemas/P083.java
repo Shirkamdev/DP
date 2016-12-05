@@ -2,7 +2,7 @@ package AA;
 
 import java.util.ArrayList;
 
-public class P100 {
+public class P083 {
 	private int N; //n maximo de dias de permiso
 	private int L; //Separacion minima de los dias
 	private int[] M; //Calendario con preferencias
@@ -10,27 +10,27 @@ public class P100 {
 	int[][] almacen;
 	int[][] almacen2;
 
-	public P100() {
+	public P083() {
 		solucion = new ArrayList<>();
 	}
 
-	public ArrayList<Integer> bestSolution(String s) {
+	public int best(String s) {
 		init(s);
 		//solucion = recursiveSolution(M.size()-1, N);
 		int sol = recursiveSolutionWithStorage(M.length, N);
-		solucion = restoreSolutionFromStorage();
+		//solucion = restoreSolutionFromStorage();
 		//solucion = iterativeSolution(M.size()-1, N);
 
-		printStorage();
-		System.out.println("-- Value returned: "+sol+ " --");
+//		printStorage();
+//		System.out.println("-- Value returned: "+sol+ " --");
+//
+//		System.out.println("-----");
+//		System.out.println("-- Solucion P083");
+//		System.out.println("-----");
+//		printVarValues();
+//		System.out.println();
 
-		System.out.println("-----");
-		System.out.println("-- Solucion P100");
-		System.out.println("-----");
-		printVarValues();
-		System.out.println();
-
-		return solucion;
+		return sol;
 	}
 
 	/////
@@ -99,12 +99,10 @@ public class P100 {
 
 				if(sol1 > sol2) { //No se pilla
 					almacen[m][n] = sol1;
-					almacen2[m][n] = -1;
 					return sol1;
 				}
 				else {
 					almacen[m][n] = sol2; //guardamos el dia
-					almacen2[m][n] = m;
 					return sol2;
 				}
 			}

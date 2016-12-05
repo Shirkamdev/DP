@@ -32,10 +32,12 @@ nb_filters1 = 6
 nb_filters2 = 16
 nb_filters3 = 120
 
+
 # convolution kernel size
 nb_conv1 = 5
 nb_conv2 = 6
 nb_conv3 = 1
+
 
 # size of pooling area for max pooling
 nb_pool = 2

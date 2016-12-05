@@ -56,3 +56,12 @@ FROM ORIGINAL FILE
 							-nb_filters2 to 13					-->	Test score: 0.373165540354	Test accuracy: 0.866228070175
 								-nb_filters3 to 135					-->	Test score: 0.471690807426	Test accuracy: 0.83260233953
 						--nb_conv1 to 4						-->	Test score: 0.439963326642	Test accuracy: 0.852339181287
+						--Added new convolutional layer
+							nb_filters4=30
+							nb_conv4=4
+			--Using adam optimizer			--> Test score: 0.402528349942	Test accuracy: 0.877192982108
+				--Reduced dropout to 0.25			-->	
+				
+
+--------------------------------
+ Done cross-validation

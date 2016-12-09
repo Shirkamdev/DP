@@ -20,7 +20,7 @@ from keras.models import load_model
 from sklearn.cross_validation import StratifiedKFold
 from keras import backend as K
 
-do_cv = False;
+do_cv = False
 
 batch_size = 16
 nb_classes = 32
@@ -85,7 +85,7 @@ def train_and_evaluate(model, data_train, labels_train, data_test, labels_test):
 	#
 	print('Test score:', score[0])
 	print('Test accuracy:', score[1])
-	accuracy_sum += score[1]
+	return score[1]
 
 #
 # Neural Network Structure definition
@@ -121,14 +121,21 @@ def create_model(input_shape):
 X, Y, input_shape, n = load_data()
 
 if do_cv:
+	print("----------------------------");
+	print("-- DOING CROSS VALIDATION --");
+	print("----------------------------");
+
 	n_folds = 10
 	skf = StratifiedKFold(Y, n_folds=n_folds, shuffle=False)
 	Y = np_utils.to_categorical(Y, nb_classes)
 	for i, (train, test) in enumerate(skf):
-		print("Running Fold", i+1, "/", n_folds)
 		model = None # Clearing the NN.
 		model = create_model(input_shape)
-		train_and_evaluate(model, X[train], Y[train], X[test], Y[test])
+
+		print("----------------------------");
+		print("Running Fold", i+1, "/", n_folds)
+		print("----------------------------");
+		accuracy_sum += train_and_evaluate(model, X[train], Y[train], X[test], Y[test])
 
 	print("AVG Test Accuracy: ", accuracy_sum/10.0)
 

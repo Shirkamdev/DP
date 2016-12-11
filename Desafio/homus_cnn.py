@@ -19,27 +19,28 @@ from keras.optimizers import SGD, adam, adadelta, nadam
 from keras.models import load_model
 from sklearn.cross_validation import StratifiedKFold
 from keras import backend as K
+from keras.preprocessing.image import ImageDataGenerator
 
-do_cv = False
+do_cv = True
 
-batch_size = 16
+batch_size = 256
 nb_classes = 32
-nb_epoch = 15
+nb_epoch = 25
 
 # HOMUS contains images of 40 x 40 pixels
 # input image dimensions for train 
 img_rows, img_cols = 30, 30
 
 # number of convolutional filters to use
-nb_filters1 = 8 #6
-nb_filters2 = 20 #16
+nb_filters1 = 8 #6 #8
+nb_filters2 = 20 #16 20
 nb_filters3 = 120
 
 
 # convolution kernel size
 nb_conv1 = 5 #5
 nb_conv2 = 6
-nb_conv3 = 1
+nb_conv3 = 2
 
 
 # size of pooling area for max pooling
@@ -87,6 +88,25 @@ def train_and_evaluate(model, data_train, labels_train, data_test, labels_test):
 	print('Test accuracy:', score[1])
 	return score[1]
 
+def train_and_evaluate_augmentation(model, data_train, labels_train, data_test, labels_test):
+	datagen = ImageDataGenerator(
+    	rotation_range=15,
+    	width_shift_range=0.2,
+    	height_shift_range=0.2)
+
+	datagen.fit(data_train)
+
+	# fits the model on batches with real-time data augmentation:
+	model.fit_generator(datagen.flow(data_train, labels_train, batch_size=32),
+		samples_per_epoch=len(data_train), nb_epoch=nb_epoch, verbose=1)
+	score = model.evaluate(data_test, labels_test, verbose=0)
+	#
+	# Results
+	#
+	print('Test score:', score[0])
+	print('Test accuracy:', score[1])
+	return score[1]
+
 #
 # Neural Network Structure definition
 #
@@ -96,14 +116,17 @@ def create_model(input_shape):
 	model.add(Convolution2D(nb_filters1, nb_conv1, nb_conv1, border_mode='valid', input_shape = input_shape))
 	model.add(MaxPooling2D(pool_size=(nb_pool, nb_pool)))
 	model.add(Activation("relu"))
+	#model.add(Dropout(0.25))
 
 
 	model.add(Convolution2D(nb_filters2, nb_conv2, nb_conv2, border_mode='valid'))
 	model.add(MaxPooling2D(pool_size=(nb_pool, nb_pool)))
 	model.add(Activation("relu"))
-	model.add(Dropout(0.25))
+	#model.add(Dropout(0.35))
+	model.add(Dropout(0.1))
 
 	model.add(Convolution2D(nb_filters3, nb_conv3, nb_conv3, border_mode='valid'))
+	model.add(Dropout(0.35))
 
 	model.add(Flatten())
 	model.add(Dense(256))
@@ -158,8 +181,15 @@ else:
 	print(nb_epoch,'epochs')
 	
 	# the data split between train and test sets
+	n_epochs = 32
+	
+	#datagen.fit(X_train)
 	model = create_model(input_shape)
-	train_and_evaluate(model, X_train, Y_train, X_test, Y_test)
+
+	#entrenamiento con valores normales
+	#train_and_evaluate(model, X_train, Y_train, X_test, Y_test)
+	train_and_evaluate_augmentation(model, X_train, Y_train, X_test, Y_test)
+
 
 # file name to save model
 filename='homus_cnn.h5'
